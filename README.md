@@ -1,7 +1,7 @@
 deltaray
 ========
 
-Delta reader for the Ray open-source toolkit for building ML applications
+The deltaray library provides a [Delta Lake](https://delta.io/) table reader for the [Ray](https://www.ray.io/) open-source ML toolkit.
 
 Quickstart
 ----------

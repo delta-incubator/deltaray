@@ -32,20 +32,22 @@ def read_delta(
     """Create an Arrow dataset from a Delta Table using Ray
 
     Args:
-        table_uri:
-        version:
-        storage_options:
-        without_files:
-        filesystem:
-        columns:
-        parallelism:
-        ray_remote_args:
-        tensor_column_schema:
-        meta_provider:
-        arrow_parquet_args:
+        table_uri: path to the Delta Lake Table
+        version: version of the Delta Lake Table
+        storage_options: dictionary of options to use for storage backend
+        without_files: if True, loads table without tracking underlying files
+        filesystem: filesystem implementation to read from
+        columns: list of columns to read
+        parallelism: requested parallelism of read, may be limited by number of files
+        ray_remote_args: kwargs passed to `ray.remote` in read tasks
+        tensor_column_schema: a dictionary of column name to tensor dtype and
+            shape mappings for converting Parquet columns to Ray's tensor
+            column extension type.
+        meta_provider: file metadata provider
+        arrow_parquet_args: other Parquet read options to pass to pyarrow
 
     Returns:
-
+        Dataset holding Arrow records read from the Delta Lake Table
     """
     dt = DeltaTable(table_uri, version, storage_options, without_files)
     return read_parquet(
