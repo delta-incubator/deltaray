@@ -31,6 +31,16 @@ def read_delta(
 ) -> Dataset[ArrowRow]:
     """Create an Arrow dataset from a Delta Table using Ray
 
+    Examples:
+        >>> import deltaray
+        >>> # Read current version of Delta Table
+        >>> ds = deltaray.read_delta(table_uri)
+        >>> ds.show()
+
+        >>> # Read specific version of Delta Table
+        >>> ds = deltaray.read_delta(table_uri, version=3)
+        >>> ds.show()
+
     Args:
         table_uri: path to the Delta Lake Table
         version: version of the Delta Lake Table
