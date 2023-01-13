@@ -1,4 +1,6 @@
+# Standard Libraries
 from setuptools import setup, find_namespace_packages
+import pathlib
 
 
 APP_NAME = "deltaray"
@@ -8,6 +10,13 @@ AUTHOR = "James Hibbard"
 DESCRIPTION = (
     "Delta reader for the Ray open-source toolkit for building ML applications"
 )
+URL = "https://github.com/delta-incubator/deltaray.git"
+
+# Directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# Text of README.md file
+README = (HERE / "README.md").read_text()
 
 setup(
     name=APP_NAME,
@@ -15,6 +24,9 @@ setup(
     license=LICENSE,
     author=AUTHOR,
     description=DESCRIPTION,
+    long_description=README,
+    long_description_content_type="text/markdown",
+    url=URL,
     install_requires=[
         "deltalake>=0.6.4",
         "ray[data]>=2.2.0",
