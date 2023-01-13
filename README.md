@@ -1,6 +1,8 @@
 deltaray
 ========
 
+[![License](https://img.shields.io/badge/license-Apache%202-brightgreen.svg)](https://raw.githubusercontent.com/delta-incubator/deltaray/main/LICENSE)
+
 The deltaray library provides a [Delta Lake](https://delta.io/) table reader for the [Ray](https://www.ray.io/) open-source ML toolkit.
 
 Quickstart
