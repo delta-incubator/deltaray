@@ -4,7 +4,7 @@ import pathlib
 
 
 APP_NAME = "deltaray"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 LICENSE = "Apache License"
 AUTHOR = "James Hibbard"
 DESCRIPTION = (

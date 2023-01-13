@@ -8,9 +8,13 @@ The deltaray library provides a [Delta Lake](https://delta.io/) table reader for
 Quickstart
 ----------
 
-Install remotely from GitHub:
+Install from PyPI:
 
-    pip install git+https://github.com/delta-incubator/deltaray.git --upgrade
+    pip install deltaray
+
+Install from GitHub:
+
+    pip install git+https://github.com/delta-incubator/deltaray.git
 
 Basic use, check notebooks for more detailed example:
 
