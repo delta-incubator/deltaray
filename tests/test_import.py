@@ -1,2 +1,2 @@
 def test_import():
-    import deltaray
+    from deltaray import read_delta
