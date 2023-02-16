@@ -37,12 +37,30 @@ Basic use, check notebooks for more detailed example:
     ds = deltaray.read_delta(table_uri)
     ds.show()
 
-Running Test Matrix
--------------------
+Running Tests
+-------------
 
-note: you can add -s flag to print to stderr/stdout during pytest-ing
+[tox](https://tox.wiki/en/latest/) standardizes running tests in Python. It handles 
+creating virtual environments for running tests alongside [pytest](https://docs.pytest.org/en/latest/), our chosen testing 
+library. It also handles generating reports on test results.
 
-    tox
+1. Open a bash shell (if on Windows use git bash, WSL, or any shell configured for bash commands).
+
+2. Clone this repo and navigate to the cloned folder.
+
+3. Install `tox` for running our test suite and managing our test environments:
+
+    ```bash
+    pip install tox
+   ```
+
+4. Run the test suite from the shell with `tox` while in the cloned repo's directory:
+
+    ```bash
+    tox -s
+   ```
+
+note: The `-s` flag prints results to stderr/stdout during pytest-ing.
     
 Building Distribution
 ---------------------
