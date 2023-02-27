@@ -61,7 +61,7 @@ def read_delta(
     """
     dt = DeltaTable(table_uri, version, storage_options, without_files)
     return read_parquet(
-        paths=dt.file_paths(),
+        paths=dt.file_uris(),
         filesystem=filesystem,
         columns=columns,
         parallelism=parallelism,
