@@ -1,5 +1,4 @@
-deltaray
-========
+# ![deltaray-header](./assets/deltaray-header.png)
 
 [![License](https://img.shields.io/badge/license-Apache%202-brightgreen.svg)](https://raw.githubusercontent.com/delta-incubator/deltaray/main/LICENSE)
 
