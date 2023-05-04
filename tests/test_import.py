@@ -46,3 +46,12 @@ def test_read_deltatable(ray_cluster):
         df_read = ds.to_pandas()
 
     assert df.equals(df_read)
+
+
+def test_reader_all_primitive_types(ray_cluster):
+    table_uri = './tests/reader_tests/generated/all_primitive_types/delta'
+    parquet_uri = './tests/reader_tests/generated/all_primitive_types/expected/latest/table_content/part-00000-2acd2058-e58d-4535-bb8b-6ed3bb27a955-c000.snappy.parquet'
+
+    actual_df = deltaray.read_delta(table_uri).to_pandas()
+    expected_df = ray.data.read_parquet(parquet_uri).to_pandas()
+    assert actual_df.compare(expected_df).empty
