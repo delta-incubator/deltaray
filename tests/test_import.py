@@ -1,3 +1,23 @@
+"""
+Note: `deltaray` does not currently use all DAT tests available
+
+    `deltaray` only uses the following:
+    - all_primitive_types
+
+    `deltaray` needs to test these additional DAT tables:
+    - basic_append
+    - basic_partitioned
+    - multi_partitioned
+    - multi_partitioned_2
+    - nested_types
+    - no_replay
+    - no_stats
+    - stats_as_struct
+    - with_checkpoint
+    - with_schema_change
+
+Tables that aren't currently being tested cover a capability currently lacking in `deltaray`
+"""
 # Standard Libraries
 import tempfile
 
