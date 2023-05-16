@@ -1,34 +1,66 @@
 """
 Note: `deltaray` does not currently use all DAT tests available
 
-    `deltaray` only uses the following:
-    - all_primitive_types
+`deltaray` uses the following DAT tables:
+- all_primitive_types
+- basic_append
+- basic_partitioned
+- no_replay
+- stats_as_struct
+- with_checkpoint
+- with_schema_change
 
-    `deltaray` needs to test these additional DAT tables:
-    - basic_append
-    - basic_partitioned
-    - multi_partitioned
-    - multi_partitioned_2
-    - nested_types
-    - no_replay
-    - no_stats
-    - stats_as_struct
-    - with_checkpoint
-    - with_schema_change
-
-Tables that aren't currently being tested cover a capability currently lacking in `deltaray`
+`deltaray` needs to test these additional DAT tables:
+- multi_partitioned: Escaped characters in data file paths aren't yet handled (#1079)
+- multi_partitioned_2: waiting for PyArrow 11.0.0 for decimal cast support (#1078)
+- nested_types: waiting for PyArrow 11.0.0 so we can ignore internal field names in equality
+- no_stats: we don't yet support files without stats (#582)
 """
 # Standard Libraries
 import tempfile
+import json
+from pathlib import Path
+from typing import Any, Dict, NamedTuple, Optional
 
 # External Libraries
 import ray
+import pyarrow.parquet as pq
 import pytest
 import pandas as pd
 import deltalake as dl
 
 # Internal Libraries
 import deltaray
+
+
+class ReadCase(NamedTuple):
+    root: Path
+    version: Optional[int]
+    case_info: Dict[str, Any]
+    version_metadata: Dict[str, Any]
+
+
+cases = []
+failing_cases = {
+    "multi_partitioned_2": "Waiting for PyArrow 11.0.0 for decimal cast support (#1078)",
+    "nested_types": "Waiting for PyArrow 11.0.0 so we can ignore internal field names in equality",
+    "multi_partitioned": "Escaped characters in data file paths aren't yet handled (#1079)",
+    "no_stats": "We don't yet support files without stats (#582)",
+}
+dat_version = "0.0.2"
+reader_case_path = Path("tests/reader_tests/generated")
+for path in reader_case_path.iterdir():
+    if path.is_dir():
+        with open(path / "test_case_info.json") as f:
+            metadata = json.load(f)
+        for version_path in (path / "expected").iterdir():
+            if path.name.startswith("v"):
+                version = int(path.name[1:])
+            else:
+                version = None
+            with open(version_path / "table_version_metadata.json") as f:
+                version_metadata = json.load(f)
+        cases.append(ReadCase(path, version, metadata, version_metadata))
 
 
 @pytest.fixture(scope='session')
@@ -68,10 +100,30 @@ def test_read_deltatable(ray_cluster):
     assert df.equals(df_read)
 
 
-def test_reader_all_primitive_types(ray_cluster):
-    table_uri = './tests/reader_tests/generated/all_primitive_types/delta'
-    parquet_uri = './tests/reader_tests/generated/all_primitive_types/expected/latest/table_content/part-00000-2acd2058-e58d-4535-bb8b-6ed3bb27a955-c000.snappy.parquet'
+@pytest.mark.parametrize(
+    "case", cases, ids=lambda case: f"{case.case_info['name']} (version={case.version})"
+)
+def test_dat(case: ReadCase, ray_cluster):
+    root, version, case_info, version_metadata = case
 
-    actual_df = deltaray.read_delta(table_uri).to_pandas()
-    expected_df = ray.data.read_parquet(parquet_uri).to_pandas()
-    assert actual_df.compare(expected_df).empty
+    if case_info['name'] in failing_cases:
+        msg = failing_cases[case_info['name']]
+        pytest.skip(msg)
+
+    # Get paths to Delta and Parquet Tables
+    delta_root = root / "delta"
+    version_path = 'latest' if version is None else f'v{version}'
+    parquet_root = root / 'expected' / version_path / 'table_content'
+
+    # Read and compare Delta and Parquet Tables
+    actual = deltaray.read_delta(str(delta_root), version=version).to_pandas()
+    expected = pq.read_table(parquet_root).to_pandas()
+    assert_tables_equal(expected, actual)
+
+
+def assert_tables_equal(first: pd.DataFrame, second: pd.DataFrame) -> None:
+    first.sort_index(axis=1, inplace=True)
+    first_sorted = first.sort_values(by=first.columns[0]).reset_index(drop=True)
+    second.sort_index(axis=1, inplace=True)
+    second_sorted = second.sort_values(by=second.columns[0]).reset_index(drop=True)
+    assert first_sorted.compare(second_sorted).empty
