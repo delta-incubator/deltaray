@@ -19,6 +19,7 @@ def read_delta(
     table_uri: str,
     *,
     version: Optional[str] = None,
+    filters: Optional["pyarrow.dataset.Expression"] = None,
     storage_options: Optional[Dict[str, str]] = None,
     without_files: bool = False,
     filesystem: Optional["pyarrow.fs.FileSystem"] = None,
@@ -44,6 +45,7 @@ def read_delta(
     Args:
         table_uri: path to the Delta Lake Table
         version: version of the Delta Lake Table
+        filters: PyArrow data expression to be evaluated against the underlying Parquet files
         storage_options: dictionary of options to use for storage backend
         without_files: if True, loads table without tracking underlying files
         filesystem: filesystem implementation to read from
@@ -60,8 +62,10 @@ def read_delta(
         Dataset holding Arrow records read from the Delta Lake Table
     """
     dt = DeltaTable(table_uri, version, storage_options, without_files)
+    fragments = dt.to_pyarrow_dataset().get_fragments(filter=filters)
+    filenames = [f'{table_uri}/{fragment.path}' for fragment in fragments]
     return read_parquet(
-        paths=dt.file_uris(),
+        paths=filenames,
         filesystem=filesystem,
         columns=columns,
         parallelism=parallelism,
