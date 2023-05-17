@@ -4,7 +4,7 @@ import pathlib
 
 
 APP_NAME = "deltaray"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 LICENSE = "Apache License"
 AUTHOR = "James Hibbard"
 DESCRIPTION = (
@@ -28,8 +28,8 @@ setup(
     long_description_content_type="text/markdown",
     url=URL,
     install_requires=[
-        "deltalake>=0.7.0",
-        "ray[data]>=2.2.0",
+        "deltalake>=0.9.0",
+        "ray[data]>=2.4.0",
         "numpy>=1.24.1",  # typing
     ],
     extras_require={},

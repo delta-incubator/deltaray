@@ -25,6 +25,7 @@ from typing import Any, Dict, NamedTuple, Optional
 # External Libraries
 import ray
 import pyarrow.parquet as pq
+import pyarrow.compute as pc
 import pytest
 import pandas as pd
 import deltalake as dl
@@ -91,13 +92,30 @@ def test_ray_cluster(ray_cluster):
 def test_read_deltatable(ray_cluster):
     with tempfile.TemporaryDirectory() as tmp:
         table_uri = f'{tmp}/delta-table'
-        df = pd.DataFrame({'id': [0, 1, 2, ], })
-        dl.write_deltalake(table_uri, df)
+        expected = pd.DataFrame({'id': [0, 1, 2, ], })
+        dl.write_deltalake(table_uri, expected)
 
         ds = deltaray.read_delta(table_uri)
-        df_read = ds.to_pandas()
+        actual = ds.to_pandas()
 
-    assert df.equals(df_read)
+    assert_tables_equal(expected, actual)
+
+
+def test_file_skipping(ray_cluster):
+    expected = pd.DataFrame({'id': [4, 5, 6, 7, 8, 9, ]})
+    filters = (pc.field("id") > pc.scalar(3))
+    with tempfile.TemporaryDirectory() as tmp:
+        table_uri = f'{tmp}/delta-table'
+        df = pd.DataFrame({'id': [0, 1, 2, ], })
+        dl.write_deltalake(table_uri, df)
+        for i in range(3, 10):
+            df = pd.DataFrame({'id': [i], })
+            dl.write_deltalake(table_uri, df, mode='append')
+
+        ds = deltaray.read_delta(table_uri, filters=filters)
+        actual = ds.to_pandas()
+
+    assert_tables_equal(expected, actual)
 
 
 @pytest.mark.parametrize(
