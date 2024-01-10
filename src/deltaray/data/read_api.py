@@ -2,17 +2,21 @@
 Reading Delta Tables with Ray
 """
 # Standard Libraries
+import sys
 from typing import Optional, List, Dict, Any, Tuple
 
 # External Libraries
 from deltalake import DeltaTable
 
 from ray.data import read_parquet
-from ray.data.dataset import Dataset
+from ray.data.dataset import Dataset, MaterializedDataset
 from ray.data.datasource import DefaultParquetMetadataProvider
 from ray.data._internal.arrow_block import ArrowRow
 
 import numpy as np
+
+
+RAY_DATASET_TYPE = MaterializedDataset if sys.version_info >= (3, 10) else Dataset
 
 
 def read_delta(
@@ -28,7 +32,7 @@ def read_delta(
     tensor_column_schema: Optional[Dict[str, Tuple[np.dtype, Tuple[int, ...]]]] = None,
     meta_provider=DefaultParquetMetadataProvider(),
     **arrow_parquet_args,
-) -> Dataset[ArrowRow]:
+) -> RAY_DATASET_TYPE[ArrowRow]:
     """Create an Arrow dataset from a Delta Table using Ray
 
     Examples:
