@@ -2,7 +2,8 @@
 Reading Delta Tables with Ray
 """
 # Standard Libraries
-from typing import Optional, List, Dict, Any, Tuple
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional, List, Dict, Any, Tuple
 
 # External Libraries
 from deltalake import DeltaTable
