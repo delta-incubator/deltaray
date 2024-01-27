@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "deltaray"
+version = "0.2.0"
+description = "Delta reader for the Ray open-source toolkit for building ML applications"
+authors = ["Your Name <you@example.com>"]
+license = "Apache License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+deltalake = ">=0.7.0"
+ray = {extras = ["data"], version = ">=2.2.0"}
+numpy = ">=1.24.1"
+grpcio= ">=1.41.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
